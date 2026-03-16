@@ -8,7 +8,7 @@ RUN dotnet restore
 
 # Copy everything else and build
 COPY . .
-RUN dotnet publish "/TinyUrlApp/TinyUrlApp.csproj" -c Release -o /app/publish
+RUN dotnet publish TinyUrlApp/TinyUrlApp.csproj -c Release -o /app/publish
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
