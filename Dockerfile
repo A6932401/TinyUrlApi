@@ -3,11 +3,8 @@ WORKDIR /src
 
 COPY . .
 
-# List files so we can see what Docker actually copied
-RUN find . -name "*.csproj" -o -name "*.sln"
-
-RUN dotnet restore --verbosity detailed
-RUN dotnet publish -c Release -o /app/publish
+RUN dotnet restore TinyUrlApp/TinyUrlApp/TinyUrlApp.csproj
+RUN dotnet publish TinyUrlApp/TinyUrlApp/TinyUrlApp.csproj -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
