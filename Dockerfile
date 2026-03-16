@@ -3,12 +3,12 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy csproj and restore dependencies
-COPY TinyUrlApp/TinyUrlApp.csproj TinyUrlApp/
-RUN dotnet restore TinyUrlApp/TinyUrlApp.csproj
+COPY /TinyUrlAppTinyUrlApp/TinyUrlApp.csproj /TinyUrlAppTinyUrlApp/
+RUN dotnet restore TinyUrlApp/TinyUrlApp/TinyUrlApp.csproj
 
 # Copy everything else and build
 COPY . .
-RUN dotnet publish TinyUrlApp/TinyUrlApp.csproj -c Release -o /app/publish
+RUN dotnet publish TinyUrlApp/TinyUrlApp/TinyUrlApp.csproj -c Release -o /app/publish
 
 # Runtime stage
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
