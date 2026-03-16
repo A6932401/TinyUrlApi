@@ -26,7 +26,7 @@ jobs:
       - name: Log in to container registry
         uses: docker/login-action@v3
         with:
-          registry: mcr.microsoft.com/
+          registry: ${{ secrets.REGISTRY }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
 
