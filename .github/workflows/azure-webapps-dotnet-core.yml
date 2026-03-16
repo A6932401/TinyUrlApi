@@ -2,7 +2,9 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
 name: Build and deploy container app to Azure Web App - TinyLink
-
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true  
+  
 on:
   push:
     branches:
