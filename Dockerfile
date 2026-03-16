@@ -3,8 +3,8 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # Copy csproj and restore dependencies
-COPY */TinyUrlApp/TinyUrlApp.csproj .
-RUN dotnet restore
+COPY TinyUrlApp/TinyUrlApp.csproj TinyUrlApp/
+RUN dotnet restore TinyUrlApp/TinyUrlApp.csproj
 
 # Copy everything else and build
 COPY . .
