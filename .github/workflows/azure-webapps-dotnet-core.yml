@@ -27,15 +27,15 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: mcr.microsoft.com/
-          username: "A6932401" #  ${{ secrets.AzureAppService_ContainerUsername_99915c96bd54460e9444a8d8b5d1d320 }}
-          password: "Dhuruv!@#321" #${{ secrets.AzureAppService_ContainerPassword_3e4c0e3422fe4aa9a2c1fe6e435c2b37 }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
 
       - name: Build and push container image to registry
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: mcr.microsoft.com/${{ secrets.AzureAppService_ContainerUsername_99915c96bd54460e9444a8d8b5d1d320 }}/appsvc/staticsite:${{ github.sha }}
+          tags: mcr.microsoft.com/${{ secrets.USERNAME }}/appsvc/staticsite:${{ github.sha }}
           file: ./Dockerfile
 
   deploy:
@@ -51,9 +51,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.clientidsecretname }}
-          tenant-id: ${{ secrets.tenantidsecretname }}
-          subscription-id: ${{ secrets.subscriptionidsecretname }}
+          client-id: ${{ secrets.CLIENTID }}
+          tenant-id: ${{ secrets.TENANTID }}
+          subscription-id: ${{ secrets.SUBSCRIPTIONID }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -61,4 +61,4 @@ jobs:
         with:
           app-name: 'TinyLink'
           slot-name: 'Production'
-          images: 'mcr.microsoft.com/${{ secrets.AzureAppService_ContainerUsername_99915c96bd54460e9444a8d8b5d1d320 }}/appsvc/staticsite:${{ github.sha }}'
+          images: 'mcr.microsoft.com/${{ secrets.USERNAME }}/appsvc/staticsite:${{ github.sha }}'
