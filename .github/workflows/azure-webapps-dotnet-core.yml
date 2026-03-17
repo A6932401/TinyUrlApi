@@ -47,18 +47,6 @@ jobs:
     needs: build
     
     steps:
-      - name: Debug secrets          # ← ADD HERE
-        run: |
-          echo "Client ID length: ${secrets.CLIENTID}"
-          echo "Tenant ID length: ${secrets.TENANTID}"
-          echo "Subscription ID length: ${#secrets.SUBSCRIPTIONID}"
-          echo "Client ID starts with: ${secrets.CLIENTID:0:4}..."
-          echo "Tenant ID starts with: ${secrets.TENANTID:0:4}..."
-          echo "Subscription ID starts with: ${secrets.SUBSCRIPTIONID:0:4}..."
-        env:
-          CLIENT_ID: ${{ secrets.CLIENTID }}
-          TENANT_ID: ${{ secrets.TENANTID }}
-          SUB_ID: ${{ secrets.SUBSCRIPTIONID }}
       - name: Login to Azure
         uses: azure/login@v2
         with:
