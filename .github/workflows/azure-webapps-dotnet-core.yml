@@ -35,7 +35,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.REGISTRY }}/${{ secrets.USERNAME }}/appsvc/staticsite:${{ github.sha }}
+          tags: '${{ secrets.REGISTRY }}/tinylink:${{ github.sha }}'
           file: ./Dockerfile
 
   deploy:
@@ -62,9 +62,7 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.CLIENTID }}
-          tenant-id: ${{ secrets.TENANTID }}
-          subscription-id: ${{ secrets.SUBSCRIPTIONID }}
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -72,4 +70,4 @@ jobs:
         with:
           app-name: 'TinyLink'
           slot-name: 'Production'
-          images: '${{ secrets.REGISTRY }}/${{ secrets.USERNAME }}/appsvc/staticsite:${{ github.sha }}'
+          images: '${{ secrets.REGISTRY }}/tinylink:${{ github.sha }}'
