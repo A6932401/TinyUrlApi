@@ -11,6 +11,8 @@ namespace TinyUrlApp.DAL.Interface
         public long EndPointAdd(EndPoint model);
         public int EndPointClickUpdate(int linkId);
         public int EndPointDelete(int linkId);
-        public List<ReturnLink> ListEndPoints(bool isPrivate, int id);
+        public List<ReturnLink> ListAllEndPoints();
+        public List<ReturnLink> ListEndPointsByRule(bool isPrivate);
+        public ReturnLink ListEndPointsById(int id);
     }
 }

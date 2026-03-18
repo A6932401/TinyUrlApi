@@ -44,19 +44,35 @@ namespace TinyUrlApp.DAL
             }
             return _connection.Execute(query, p, DbTransaction);
         }
-        public List<ReturnLink> ListEndPoints(bool isPrivate,int id)
+        public ReturnLink ListEndPointsById(int id)
+        {
+            var p = new DynamicParameters();
+            p.Add("id", id);
+
+            string query = "select id, shortlink,originallink,isprivate,status,createddate,clickcount from EndPoint where id =@id";            
+
+            var rtn = _connection.Query<ReturnLink>(query, p, transaction: DbTransaction).FirstOrDefault();
+            return rtn;
+
+        }
+        public List<ReturnLink> ListEndPointsByRule(bool isPrivate)
         {
             var p = new DynamicParameters();
             p.Add("isPrivate", isPrivate ? 1 : 0);
-            p.Add("id", id);
 
             string query = @"select id,shortlink,originallink,isprivate,status,createddate,clickcount from EndPoint where isprivate =@isPrivate ";
-            if(id > 0)
-            {
-                query = "select id, shortlink,originallink,isprivate,status,createddate,clickcount from EndPoint where id =@id";
-            }
+            
 
             var rtn = _connection.Query<ReturnLink>(query, p, transaction: DbTransaction).ToList();
+            return rtn;
+
+        }
+        public List<ReturnLink> ListAllEndPoints()
+        {
+
+            string query = @"select id,shortlink,originallink,isprivate,status,createddate,clickcount from EndPoint ";           
+
+            var rtn = _connection.Query<ReturnLink>(query, transaction: DbTransaction).ToList();
             return rtn;
 
         }

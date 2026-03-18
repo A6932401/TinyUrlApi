@@ -40,7 +40,7 @@ namespace TinyUrlApp.EndPoints
             });
             endpointRoute.MapGet("/link",async (IEndPointLogic logic) =>
             {
-                var data = logic.GetLink(false, 0);
+                var data = logic.GetLinkByRule(false);
                 if (data.Count > 0)
                 {
                     var successResponse = new ResponceModel<List<ReturnLink>>
@@ -72,10 +72,10 @@ namespace TinyUrlApp.EndPoints
 
                     return Results.BadRequest(responseValue);
                 }
-                var data = logic.GetLink(false, id);
-                if (data.Count > 0)
+                var data = logic.GetLinkById( id);
+                if (!string.IsNullOrEmpty(data.originallink))
                 {
-                    var successResponse = new ResponceModel<List<ReturnLink>>
+                    var successResponse = new ResponceModel<ReturnLink>
                     {
                         status = "Success",
                         response = data,
@@ -105,7 +105,7 @@ namespace TinyUrlApp.EndPoints
                     return Results.BadRequest(responseValue);
                 }
                 var data = logic.DeleteEndPoint(id);
-                if (data)
+                if (data.Item1 == true)
                 {
                     var successResponse = new ResponceModel<List<string>>
                     {
@@ -118,6 +118,7 @@ namespace TinyUrlApp.EndPoints
                     var successResponse = new ResponceModel<List<string>>
                     {
                         status = "Failed",
+                        message = data.Item2
                     };
                     return Results.Ok(successResponse);
                 }
@@ -139,19 +140,16 @@ namespace TinyUrlApp.EndPoints
                     return Results.BadRequest(responseValue);
                 }
                 var data = logic.UpdateClickCount(id);
-                if (data)
+                if (data.Item1 == true)
                 {
-                    var successResponse = new ResponceModel<List<string>>
-                    {
-                        status = "Success",
-                    };
-                    return Results.Ok(successResponse);
+                    return Results.Redirect(data.Item2);
                 }
                 else
                 {
                     var successResponse = new ResponceModel<List<string>>
                     {
                         status = "Failed",
+                        message = data.Item2
                     };
                     return Results.Ok(successResponse);
                 }

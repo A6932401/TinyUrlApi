@@ -1,4 +1,5 @@
-﻿using TinyUrlApp.DAL.Interface;
+﻿using Microsoft.Extensions.Options;
+using TinyUrlApp.DAL.Interface;
 using TinyUrlApp.Logic.Interface;
 using TinyUrlApp.Model;
 using TinyUrlApp.Model.Entities;
@@ -11,9 +12,12 @@ namespace TinyUrlApp.Logic
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IEndPointDA _da;
-        public EndPointLogic(IUnitOfWork unitOfWork,IEndPointDA da) {
+        private readonly AppSetting appSetting;
+        public EndPointLogic(IUnitOfWork unitOfWork,IEndPointDA da, IOptions<AppSetting> options )
+        {
             _unitOfWork = unitOfWork;
             _da = da;
+            appSetting = options.Value;
         }
 
         public ReturnLink AddLink(LinkAdd linkAdd)
@@ -22,8 +26,10 @@ namespace TinyUrlApp.Logic
             {
                 using(_unitOfWork.Begin())
                 {
+                    string b = "";
+                    var a = Convert.ToInt32(b);
                     _da.DbTransaction = _unitOfWork.Transaction;
-                    string ShortLink = linkAdd.originalUrl.GetShortLink();
+                    string ShortLink = appSetting.baseUrl.GetShortLink();
                     var endPoint = new EndPoint
                     {
                         shortlink = ShortLink,
@@ -49,43 +55,94 @@ namespace TinyUrlApp.Logic
                 
         }
 
-        public bool UpdateClickCount(int linkId)
+        public Tuple<bool,string> UpdateClickCount(int linkId)
         {
+            Tuple<bool, string> tuple = Tuple.Create(false, "");
             using (_unitOfWork.GetDbConnection())
             {
                 using (_unitOfWork.Begin())
                 {
                     _da.DbTransaction = _unitOfWork.Transaction;
                     
-                    _da.EndPointClickUpdate(linkId);
+                    var chkExists = _da.ListEndPointsById(linkId);
+                    if (!string.IsNullOrEmpty(chkExists.originallink)) {
+                       int upd =  _da.EndPointClickUpdate(linkId);
+                        if (upd > 0) {
+                            
+                            tuple = Tuple.Create(true, chkExists.originallink);
+                        }
+                        else
+                        {
+                            tuple = Tuple.Create(false, "Error during Update");
+                        }
+                    }
+                    else
+                    {
+                        tuple = Tuple.Create(false, "Invalid Id");
+
+                    }
                     _unitOfWork.Commit();
-                    return true;
+                    return tuple;
                 }
             }
         }
 
-        public bool DeleteEndPoint(int linkId)
+        public Tuple<bool, string> DeleteEndPoint(int linkId)
         {
+            Tuple<bool, string> tuple = Tuple.Create(false, "");
             using (_unitOfWork.GetDbConnection())
             {
                 using (_unitOfWork.Begin())
                 {
                     _da.DbTransaction = _unitOfWork.Transaction;
 
-                    _da.EndPointDelete(linkId);
+                    var chkExists = _da.ListEndPointsById(linkId);
+                    if (!string.IsNullOrEmpty(chkExists.originallink))
+                    {
+                        int upd = _da.EndPointDelete(linkId);
+                        if (upd > 0)
+                        {
+
+                            tuple = Tuple.Create(true, "Link Deleted Successfully");
+                        }
+                        else
+                        {
+                            tuple = Tuple.Create(false, "Error during Delete");
+                        }
+                    }
+                    else
+                    {
+                        tuple = Tuple.Create(false, "Invalid Id");
+
+                    }
                     _unitOfWork.Commit();
-                    return true;
+                    return tuple;
                 }
             }
         }
-        public List<ReturnLink> GetLink(bool isPrivate,int id)
+        public ReturnLink GetLinkById(int id)
         {
             using (_unitOfWork.GetDbConnection())
             {
-                var idVal = _da.ListEndPoints(isPrivate,id);                    
+                var idVal = _da.ListEndPointsById(id);                    
                 return idVal;            
             }
-
+        }
+        public List<ReturnLink> GetLinkByRule(bool isPrivate)
+        {
+            using (_unitOfWork.GetDbConnection())
+            {
+                var idVal = _da.ListEndPointsByRule(isPrivate);
+                return idVal;
+            }
+        }
+        public List<ReturnLink> GetAllLink()
+        {
+            using (_unitOfWork.GetDbConnection())
+            {
+                var idVal = _da.ListAllEndPoints();
+                return idVal;
+            }
         }
     }
 }

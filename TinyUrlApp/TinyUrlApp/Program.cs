@@ -5,6 +5,7 @@ using SQLitePCL;
 using System;
 using System.Data;
 using System.Data.Common;
+using System.Reflection.Metadata;
 using TinyUrlApp.DAL;
 using TinyUrlApp.DAL.Interface;
 using TinyUrlApp.EndPoints;
@@ -17,14 +18,28 @@ using TinyUrlApp.UnitOfWork;
 using TinyUrlApp.validatorValidator;
 var builder = WebApplication.CreateBuilder(args);
 
-//test
+var appConfigConn = builder.Configuration["Azure:AppConfigConnection"];
+var envName = builder.Environment.EnvironmentName;
+builder.Configuration.AddAzureAppConfiguration(option =>
+{
+    option.Connect(appConfigConn)
+    .Select("*", envName);
+});
+
+// Program.cs — register it
+builder.Services
+    .Configure<AppSetting>(builder.Configuration.GetSection(AppSetting.SECNAME));
+
+var appSettings = builder.Configuration
+    .GetSection(AppSetting.SECNAME)
+    .Get<AppSetting>();
 // Add CORS policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("TinyUrlApp",
         policy =>
         {
-            policy.WithOrigins("http://localhost:4200") // Angular dev server
+            policy.WithOrigins(appSettings.CorsOrigins) // Angular dev server
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
@@ -34,13 +49,22 @@ builder.Services.AddCors(options =>
 Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .WriteTo.Console()
+                .WriteTo.AzureBlobStorage(
+        connectionString: appSettings.blobStorageConnection, 
+        storageContainerName: appSettings.blobStorageContainer,  
+       storageFileName: appSettings.blobStorageFileFormat,
+        // rolling blob per day
+        restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information
+    )
+
                 .WriteTo.File("Logs/Logs.txt", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
 builder.Host.UseSerilog();
 // Add services to the container.
 
+
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddValidatorsFromAssemblyContaining<EndPointValidator>();
@@ -51,7 +75,7 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IEndPointDA, EndPointDA>();
 builder.Services.AddScoped<DbConnection>(sp =>
 {
-    var connection = new SqliteConnection("Data Source=SQLite.db");
+    var connection = new SqliteConnection(appSettings.dbConnection);
     connection.Open(); // keep it open for scoped lifetime
     return connection;
 });

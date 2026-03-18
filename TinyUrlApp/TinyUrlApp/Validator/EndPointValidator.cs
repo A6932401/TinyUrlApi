@@ -8,9 +8,21 @@ namespace TinyUrlApp.validatorValidator
         public EndPointValidator() {
             RuleFor(a => a.originalUrl)
                     .NotEmpty().WithMessage("Url Should not empty")
-                    .Matches(@"^(https?://)?([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?$").WithMessage("Invalid Url");
+                    .Must(url => isValidUrl(url))
+                    .WithMessage("Invalid Url");
             RuleFor(a => a.isPrivate)
                 .NotNull().WithMessage("isPrivate should not empty");
+        }
+
+        private bool isValidUrl(string url)
+        {
+            if (Uri.TryCreate(url, UriKind.Absolute, out var uri)
+                 && (uri.Scheme == Uri.UriSchemeHttp
+                  || uri.Scheme == Uri.UriSchemeHttps)) { 
+                return true;
+            }
+
+            return false;
         }
     }
 

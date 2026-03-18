@@ -2,12 +2,15 @@
 {
     public static class ShortLink
     {
-        public static string GetShortLink(this string fullLink)
+        private static readonly Random _random = Random.Shared; 
+        private const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        public static string GetShortLink(this string baseUrl)
         {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            var random = new Random();
-            return new string(Enumerable.Repeat(chars, 6)
-                .Select(s => s[random.Next(s.Length)]).ToArray());            
+           var code = new string(Enumerable.Repeat(Chars, 6)
+            .Select(s => s[_random.Next(s.Length)])
+            .ToArray());
+
+            return $"{baseUrl.TrimEnd('/')}/{code}";           
         }
     }
 }

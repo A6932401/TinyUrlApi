@@ -5,8 +5,10 @@ namespace TinyUrlApp.Logic.Interface
     public interface IEndPointLogic
     {
         public ReturnLink AddLink(LinkAdd linkAdd);
-        public bool UpdateClickCount(int linkId);
-        public bool DeleteEndPoint(int linkId);
-        public List<ReturnLink> GetLink(bool isPrivate, int id);
+        public Tuple<bool, string> UpdateClickCount(int linkId);
+        public Tuple<bool, string> DeleteEndPoint(int linkId);
+        public ReturnLink GetLinkById(int id);
+        public List<ReturnLink> GetLinkByRule(bool isPrivate);
+        public List<ReturnLink> GetAllLink();
     }
 }
