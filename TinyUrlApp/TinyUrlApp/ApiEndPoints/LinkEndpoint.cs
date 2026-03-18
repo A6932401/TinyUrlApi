@@ -142,11 +142,18 @@ namespace TinyUrlApp.EndPoints
                 var data = logic.UpdateClickCount(id);
                 if (data.Item1 == true)
                 {
-                    return Results.Redirect(data.Item2);
+                    var successResponse = new ResponceModel<string>
+                    {
+                        status = "Success",
+                        message = "Updated Successfully",
+                        response = data.Item2
+                    };
+                    return Results.Ok(successResponse);
+                    //return Results.Redirect(data.Item2, permanent: true);
                 }
                 else
                 {
-                    var successResponse = new ResponceModel<List<string>>
+                    var successResponse = new ResponceModel<string>
                     {
                         status = "Failed",
                         message = data.Item2
