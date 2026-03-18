@@ -35,7 +35,7 @@ jobs:
         with:
           context: .
           push: true
-          images: '${{ secrets.REGISTRY }}/tinylink:${{ github.sha }}'
+          tags: '${{ secrets.REGISTRY }}/tinylink:${{ github.sha }}'
           file: ./Dockerfile
 
   deploy:
