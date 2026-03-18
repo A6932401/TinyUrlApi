@@ -14,6 +14,7 @@ using TinyUrlApp.Logic;
 using TinyUrlApp.Logic.Interface;
 using TinyUrlApp.Model;
 using TinyUrlApp.UnitOfWork;
+using Microsoft.Data.SqlClient;
 
 using TinyUrlApp.validatorValidator;
 var builder = WebApplication.CreateBuilder(args);
@@ -73,9 +74,10 @@ builder.Services.AddValidatorsFromAssemblyContaining<EndPointIdValidator>();
 builder.Services.AddScoped<IEndPointLogic, EndPointLogic>(); 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IEndPointDA, EndPointDA>();
+
 builder.Services.AddScoped<DbConnection>(sp =>
 {
-    var connection = new SqliteConnection(appSettings.dbConnection);
+    var connection = new SqlConnection(appSettings.dbConnection);   
     connection.Open(); // keep it open for scoped lifetime
     return connection;
 });

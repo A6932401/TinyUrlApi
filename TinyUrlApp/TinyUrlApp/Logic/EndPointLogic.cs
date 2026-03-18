@@ -26,8 +26,6 @@ namespace TinyUrlApp.Logic
             {
                 using(_unitOfWork.Begin())
                 {
-                    string b = "";
-                    var a = Convert.ToInt32(b);
                     _da.DbTransaction = _unitOfWork.Transaction;
                     string ShortLink = appSetting.baseUrl.GetShortLink();
                     var endPoint = new EndPoint
