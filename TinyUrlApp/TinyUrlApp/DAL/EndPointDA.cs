@@ -32,17 +32,22 @@ namespace TinyUrlApp.DAL
             
             return _connection.Execute(query, p, DbTransaction);
         }
-        public int EndPointDelete(int linkId)
+        public int EndPointDeleteById(int linkId)
         {
             var p = new DynamicParameters();
             p.Add("linkId", linkId);
 
-            string query = "delete from EndPoint ";
-            if (linkId > 0)
-            {
-                query += "where id = @linkId";
-            }
+            string query = "delete from EndPoint where id = @linkId";
+           
             return _connection.Execute(query, p, DbTransaction);
+        }
+        public int EndPointDeleteByAll()
+        {
+            var p = new DynamicParameters();
+
+            string query = "delete from EndPoint";
+
+            return _connection.Execute(query,p, DbTransaction);
         }
         public ReturnLink ListEndPointsById(int id)
         {

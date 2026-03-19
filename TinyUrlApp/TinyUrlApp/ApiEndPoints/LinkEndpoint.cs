@@ -123,6 +123,28 @@ namespace TinyUrlApp.EndPoints
                     return Results.Ok(successResponse);
                 }
             });
+            endpointRoute.MapDelete("/link/All", async (IEndPointLogic logic) =>
+            {
+               
+                var data = logic.DeleteAllEndPoint();
+                if (data.Item1 == true)
+                {
+                    var successResponse = new ResponceModel<List<string>>
+                    {
+                        status = "Success",
+                    };
+                    return Results.Ok(successResponse);
+                }
+                else
+                {
+                    var successResponse = new ResponceModel<List<string>>
+                    {
+                        status = "Failed",
+                        message = data.Item2
+                    };
+                    return Results.Ok(successResponse);
+                }
+            });
             endpointRoute.MapPut("/link", async (int id, IValidator<int> validator, IEndPointLogic logic) =>
             {
                 var result = await validator.ValidateAsync(id);

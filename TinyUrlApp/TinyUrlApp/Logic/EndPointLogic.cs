@@ -97,7 +97,7 @@ namespace TinyUrlApp.Logic
                     var chkExists = _da.ListEndPointsById(linkId);
                     if (!string.IsNullOrEmpty(chkExists.originallink))
                     {
-                        int upd = _da.EndPointDelete(linkId);
+                        int upd = _da.EndPointDeleteById(linkId);
                         if (upd > 0)
                         {
 
@@ -112,6 +112,31 @@ namespace TinyUrlApp.Logic
                     {
                         tuple = Tuple.Create(false, "Invalid Id");
 
+                    }
+                    _unitOfWork.Commit();
+                    return tuple;
+                }
+            }
+        }
+
+        public Tuple<bool, string> DeleteAllEndPoint()
+        {
+            Tuple<bool, string> tuple = Tuple.Create(false, "");
+            using (_unitOfWork.GetDbConnection())
+            {
+                using (_unitOfWork.Begin())
+                {
+                    _da.DbTransaction = _unitOfWork.Transaction;
+
+                    int upd = _da.EndPointDeleteByAll();
+                    if (upd > 0)
+                    {
+
+                        tuple = Tuple.Create(true, "Link Deleted Successfully");
+                    }
+                    else
+                    {
+                        tuple = Tuple.Create(false, "Error during Delete");
                     }
                     _unitOfWork.Commit();
                     return tuple;

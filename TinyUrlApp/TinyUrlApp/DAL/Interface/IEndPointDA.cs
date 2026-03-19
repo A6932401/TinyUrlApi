@@ -10,9 +10,10 @@ namespace TinyUrlApp.DAL.Interface
         public DbTransaction DbTransaction { get; set; }
         public long EndPointAdd(EndPoint model);
         public int EndPointClickUpdate(int linkId);
-        public int EndPointDelete(int linkId);
+        public int EndPointDeleteById(int linkId);
         public List<ReturnLink> ListAllEndPoints();
         public List<ReturnLink> ListEndPointsByRule(bool isPrivate);
         public ReturnLink ListEndPointsById(int id);
+        public int EndPointDeleteByAll();
     }
 }
