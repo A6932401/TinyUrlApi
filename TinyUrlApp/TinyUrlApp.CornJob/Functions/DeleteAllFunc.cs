@@ -19,7 +19,7 @@ public class DeleteAllFunc
 
     // Runs every 1 hour → "0 0 * * * *"
     [Function("DeleteAllLinksFunction")]
-    public async Task Run([TimerTrigger("0 */1 * * * *")] TimerInfo timerInfo)
+    public async Task Run([TimerTrigger("0 0 * * * *")] TimerInfo timerInfo)
     {
         _logger.LogInformation("DeleteAllLinksFunction triggered at: {Time}", DateTime.UtcNow);
 
