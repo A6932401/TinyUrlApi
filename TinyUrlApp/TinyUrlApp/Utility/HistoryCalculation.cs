@@ -4,7 +4,7 @@
     {
         public static string HistoryCal(this DateTime CreatedDate)
         {
-            var diff = DateTime.UtcNow - CreatedDate;
+            var diff = DateTime.Now - CreatedDate;
 
             if (diff.TotalMinutes < 1)
                 return "just now";
