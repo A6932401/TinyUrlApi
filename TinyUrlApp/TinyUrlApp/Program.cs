@@ -1,4 +1,5 @@
 using FluentValidation;
+using Microsoft.Data.SqlClient;
 using Microsoft.Data.Sqlite;
 using Serilog;
 using SQLitePCL;
@@ -14,33 +15,37 @@ using TinyUrlApp.Logic;
 using TinyUrlApp.Logic.Interface;
 using TinyUrlApp.Model;
 using TinyUrlApp.UnitOfWork;
-using Microsoft.Data.SqlClient;
-
+using TinyUrlApp.Utility;
 using TinyUrlApp.validatorValidator;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
 var appConfigConn = builder.Configuration["Azure:AppConfigConnection"];
 var envName = builder.Environment.EnvironmentName;
+
+//Config values taken from Azure
 builder.Configuration.AddAzureAppConfiguration(option =>
 {
     option.Connect(appConfigConn)
     .Select("*", envName);
 });
 
-// Program.cs — register it
+// Config values assign to AppSetting
 builder.Services
     .Configure<AppSetting>(builder.Configuration.GetSection(AppSetting.SECNAME));
 
 var appSettings = builder.Configuration
     .GetSection(AppSetting.SECNAME)
     .Get<AppSetting>();
-// Add CORS policy
+
+// Cors Config
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("TinyUrlApp",
         policy =>
         {
-            policy.WithOrigins(appSettings.CorsOrigins) // Angular dev server
+            policy.WithOrigins(appSettings.CorsOrigins) 
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
@@ -54,7 +59,6 @@ Log.Logger = new LoggerConfiguration()
         connectionString: appSettings.blobStorageConnection, 
         storageContainerName: appSettings.blobStorageContainer,  
        storageFileName: appSettings.blobStorageFileFormat,
-        // rolling blob per day
         restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Information
     )
 
@@ -74,11 +78,11 @@ builder.Services.AddValidatorsFromAssemblyContaining<EndPointIdValidator>();
 builder.Services.AddScoped<IEndPointLogic, EndPointLogic>(); 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IEndPointDA, EndPointDA>();
-
 builder.Services.AddScoped<DbConnection>(sp =>
 {
-    var connection = new SqlConnection(appSettings.dbConnection);   
-    connection.Open(); // keep it open for scoped lifetime
+    var connection = new SqlConnection(appSettings.dbConnection);
+    
+    connection.Open(); 
     return connection;
 });
 
@@ -87,7 +91,7 @@ var app = builder.Build();
 app.UseCors("TinyUrlApp");
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
